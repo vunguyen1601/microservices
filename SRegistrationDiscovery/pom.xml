@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>xyz.vtools</groupId>
+	<artifactId>SRegistrationDiscovery</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>SRegistrationDiscovery</name>
+	<description>Service Registry and Discovery</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.5.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<spring-cloud.version>Finchley.SR1</spring-cloud.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<!-- <plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<executable>true</executable>
+				</configuration>
+			</plugin>
+			 -->
+			<!-- Make this jar executable -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/log4j.properties</exclude>
+					</excludes>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>xyz.vtools.server.SRegistrationDiscoveryApplication</mainClass>
+							<classpathPrefix></classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			
+			
+
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>appassembler-maven-plugin</artifactId>
+				<version>1.10</version>
+				<configuration>
+					<repositoryLayout>flat</repositoryLayout>
+					<includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
+					<target>${project.build.directory}</target>
+					<daemons>
+						<daemon>
+							<id>vhes-discovery</id>
+							<mainClass>xyz.vtools.server.SRegistrationDiscoveryApplication</mainClass>
+							<commandLineArguments>
+								<commandLineArgument>start</commandLineArgument>
+							</commandLineArguments>
+							<platforms>
+								<platform>jsw</platform>
+							</platforms>
+							<generatorConfigurations>
+								<generatorConfiguration>
+									<generator>jsw</generator>
+									<includes>
+										<!--<include>linux-x86-32</include> -->
+										<include>linux-x86-64</include>
+										<!-- <include>windows-x86-32</include> <include>windows-x86-64</include> -->
+									</includes>
+									<configuration>
+										<property>
+											<name>configuration.directory.in.classpath.first</name>
+											<value>etc</value>
+										</property>
+										<property>
+											<name>wrapper.ping.timeout</name>
+											<value>600</value>
+										</property>		
+										<property>
+											<name>set.default.REPO_DIR</name>
+											<value>./lib</value>
+										</property>
+										<property>
+											<name>wrapper.shutdown.timeout</name>
+											<value>300</value>
+										</property>
+										<property>
+											<name>wrapper.logfile</name>
+											<value>./logs/wrapper_YYYYMMDD.log</value>
+										</property>
+										<property>
+											<name>wrapper.java.additional.1</name>
+											<value>-Duser.timezone=Asia/Ho_Chi_Minh</value>
+										</property>
+										<property>
+											<name>wrapper.java.additional.2</name>
+											<value>-Dspring.profiles.active=default</value>
+										</property>										
+										
+										<property>
+											<name>wrapper.logfile.rollmode</name>
+											<value>DATE</value>
+										</property>
+										<property>
+											<name>wrapper.syslog.loglevel</name>
+											<value>ERROR</value>
+										</property>
+										<property>
+											<name>wrapper.logfile.format</name>
+											<value>PM</value>
+										</property>
+										<property>
+											<name>wrapper.console.format</name>
+											<value>PM</value>
+										</property>
+										
+										<property>
+											<name>run.as.user.envvar</name>
+											<value>svhes</value>
+										</property>
+									</configuration>
+								</generatorConfiguration>
+							</generatorConfigurations>
+							<jvmSettings>
+								<!-- <initialMemorySize>4G</initialMemorySize> -->
+								<!--<maxMemorySize>16G</maxMemorySize> -->
+
+								<extraArguments>
+									<extraArgument>-server</extraArgument>
+								</extraArguments>
+							</jvmSettings>
+						</daemon>
+					</daemons>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate-jsw-scripts</id>
+						<phase>package</phase>
+						<goals>
+							<goal>generate-daemons</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>
